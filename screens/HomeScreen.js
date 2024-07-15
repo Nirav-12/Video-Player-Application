@@ -60,7 +60,6 @@ const HomeScreen = ({ navigation }) => {
         "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/The_Clever_She_Goat___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4?t=2024-07-15T06%3A55%3A52.835Z",
     },
   ]);
-  console.log("------------------->>>>>>", videoList);
 
   useEffect(() => {
     // getVideoList();
@@ -94,7 +93,6 @@ const HomeScreen = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             onPress={() => {
-              // navigation.navigate("Video", { video: item });
               PlayVideo.play(item);
             }}
           >

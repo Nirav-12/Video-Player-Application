@@ -10,7 +10,6 @@ import { AuthContext } from "./context/AuthProvider";
 export default function App() {
   const { user, session } = useContext(AuthContext);
 
-  console.log("user ------->>>", session?.user?.user_metadata?.name);
   return (
     <NavigationContainer>
       {user == null && <Loading />}

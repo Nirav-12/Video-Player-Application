@@ -14,51 +14,55 @@ import PlayVideo from "../screens/PlayVideo";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
-function HomeTabs() {
+export default function Main() {
+  return (
+    <Stack.Navigator>
+      <Stack.Screen
+        name="Main"
+        component={MainTab}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen name="Search" component={SearchScreen} />
+    </Stack.Navigator>
+  );
+}
+
+function MainTab() {
   return (
     <>
       <PlayVideo />
-      <Stack.Navigator>
-        <Stack.Screen
+
+      <Tab.Navigator
+        screenOptions={({ route }) => ({
+          tabBarActiveBackgroundColor: "black",
+          tabBarInactiveBackgroundColor: "black",
+          tabBarActiveTintColor: "#4E9CA8",
+          tabBarInactiveTintColor: "white",
+          tabBarStyle: {
+            height: 50,
+          },
+          tabBarIcon: ({ color, size }) => {
+            let iconName;
+
+            if (route.name === "Home") {
+              iconName = "home";
+            } else if (route.name === "Search") {
+              iconName = "search";
+            } else if (route.name === "Profile") {
+              iconName = "person";
+            }
+
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+        })}
+      >
+        <Tab.Screen
           name="Home"
           component={HomeScreen}
           options={{ headerShown: false }}
         />
-        <Stack.Screen name="Search" component={SearchScreen} />
-      </Stack.Navigator>
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
     </>
-  );
-}
-
-export default function Main() {
-  return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarActiveBackgroundColor: "black",
-        tabBarInactiveBackgroundColor: "black",
-        tabBarActiveTintColor: "#4E9CA8",
-        tabBarInactiveTintColor: "white",
-        tabBarIcon: ({ color, size }) => {
-          let iconName;
-
-          if (route.name === "HomeTabs") {
-            iconName = "home";
-          } else if (route.name === "Search") {
-            iconName = "search";
-          } else if (route.name === "Profile") {
-            iconName = "person";
-          }
-
-          return <Ionicons name={iconName} size={size} color={color} />;
-        },
-      })}
-    >
-      <Tab.Screen
-        name="HomeTabs"
-        component={HomeTabs}
-        options={{ headerShown: false }}
-      />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
-    </Tab.Navigator>
   );
 }

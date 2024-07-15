@@ -8,10 +8,10 @@ const PlayVideo = () => {
 
   useEffect(() => {
     DeviceEventEmitter.addListener("playVideo", (props) => {
-      console.log("-------->>> playvideo", props);
+      // console.log("-------->>> playvideo", props);
       setPlayVideo(props);
     });
-    DeviceEventEmitter.addListener("hideAll", (props) => {
+    DeviceEventEmitter.addListener("close", (props) => {
       setPlayVideo(null);
     });
 
