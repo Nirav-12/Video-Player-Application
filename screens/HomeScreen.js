@@ -1,28 +1,122 @@
-import React from 'react';
-import {View, Text, FlatList, TouchableOpacity, StyleSheet} from 'react-native';
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+} from "react-native";
+import { AuthContext } from "../context/AuthProvider";
+import { supabase } from "../lib/supabase";
+import PlayVideo from "./PlayVideo";
 
-const videos = [
-  {id: '1', title: 'Video 1', description: 'Description 1'},
-  {id: '2', title: 'Video 2', description: 'Description 2'},
-  // Add more videos as needed
-];
+const HomeScreen = ({ navigation }) => {
+  const { session } = useContext(AuthContext);
+  const [videoList, setVideoList] = useState([
+    {
+      created_at: "2024-07-15T06:57:21.632903+00:00",
+      description: null,
+      id: 4,
+      thumbnail_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Wood_Pecker__Deer_And_Tortoise___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.webp?t=2024-07-15T06%3A56%3A54.272Z ",
+      title:
+        "Wood Pecker, Deer And Tortoise - Jataka Tales In English - Animation / Cartoon Stories For Kids",
+      video_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Wood_Pecker__Deer_And_Tortoise___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4",
+    },
+    {
+      created_at: "2024-07-15T06:52:34.706032+00:00",
+      description:
+        "Fox And The Otters - Jataka Tales In English - Animation / Cartoon Stories For Kids",
+      id: 1,
+      thumbnail_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/%20Fox%20And%20The%20Otters%20-%20Jataka%20Tales%20In%20English.webp?t=2024-07-15T06%3A50%3A31.758Z",
+      title: "Fox And The Otters",
+      video_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/%20Fox%20And%20The%20Otters%20-%20Jataka%20Tales%20In%20English.mp4?t=2024-07-15T06%3A50%3A20.588Z",
+    },
+    {
+      created_at: "2024-07-15T06:55:42.60963+00:00",
+      description:
+        "Greedy Crow - Jataka Tales In English - Animation / Cartoon Stories For Kids",
+      id: 2,
+      thumbnail_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Greedy_Crow___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.webp?t=2024-07-15T06%3A55%3A06.881Z",
+      title: "Greedy Crow",
+      video_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Greedy_Crow___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4?t=2024-07-15T06%3A54%3A58.464Z",
+    },
+    {
+      created_at: "2024-07-15T06:56:32.434201+00:00",
+      description:
+        "The Clever She Goat - Jataka Tales In English - Animation / Cartoon Stories For Kids ",
+      id: 3,
+      thumbnail_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/The_Clever_She_Goat___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.webp?t=2024-07-15T06%3A56%3A02.141Z",
+      title:
+        "The Clever She Goat - Jataka Tales In English - Animation / Cartoon Stories For Kids ",
+      video_url:
+        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/The_Clever_She_Goat___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4?t=2024-07-15T06%3A55%3A52.835Z",
+    },
+  ]);
+  console.log("------------------->>>>>>", videoList);
 
-const HomeScreen = ({navigation}) => {
+  useEffect(() => {
+    // getVideoList();
+  }, []);
+
+  const getVideoList = async () => {
+    let { data: Videos, error } = await supabase
+      .from("Videos")
+      .select("*")
+      .range(videoList.length, videoList.length + 1);
+
+    console.log(error);
+    setVideoList((videoList) => [...videoList, ...Videos]);
+  };
+
+  const addData = async () => {
+    const error = await supabase.from("User").insert({
+      name: session?.user?.user_metadata?.name,
+      email: session?.user?.user_metadata?.name.email,
+    });
+
+    console.log("----->>>>>>>>error", error);
+  };
+
   return (
     <View style={styles.container}>
       <FlatList
-        data={videos}
-        keyExtractor={item => item.id}
-        renderItem={({item}) => (
+        data={videoList}
+        keyExtractor={(item) => item.id}
+        // onEndReached={getVideoList}
+        renderItem={({ item }) => (
           <TouchableOpacity
-            onPress={() => navigation.navigate('Video', {video: item})}>
+            onPress={() => {
+              // navigation.navigate("Video", { video: item });
+              PlayVideo.play(item);
+            }}
+          >
             <View style={styles.videoItem}>
-              <Text style={styles.title}>{item.title}</Text>
-              <Text style={styles.description}>{item.description}</Text>
+              <Image
+                source={{ uri: item.thumbnail_url }}
+                style={styles.thumbnail}
+              />
+              <View style={styles.textContainer}>
+                <Text style={styles.title} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text style={styles.description}>{item.description}</Text>
+              </View>
             </View>
           </TouchableOpacity>
         )}
       />
+
+      {/* <TouchableOpacity style={{ marginTop: 20 }} onPress={addData}>
+        <Text>Add data to table</Text>
+      </TouchableOpacity> */}
     </View>
   );
 };
@@ -31,17 +125,32 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
+    backgroundColor: "#f0f0f0",
   },
   videoItem: {
     marginBottom: 16,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    overflow: "hidden",
+    elevation: 2,
+    padding: 10,
+  },
+  thumbnail: {
+    width: "100%",
+    height: 220,
+    resizeMode: "contain",
+  },
+  textContainer: {
+    flex: 1,
+    padding: 10,
   },
   title: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   description: {
     fontSize: 14,
-    color: 'gray',
+    color: "gray",
   },
 });
 
