@@ -19,7 +19,6 @@ export default function Main() {
         component={MainTab}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Search" component={SearchScreen} />
     </Stack.Navigator>
   );
 }
@@ -55,6 +54,7 @@ function MainTab() {
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} />
+        <Tab.Screen name="Search" component={SearchScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </>

@@ -12,6 +12,7 @@ import { supabase } from "../lib/supabase";
 import PlayVideo from "./PlayVideo";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome } from "@expo/vector-icons";
+import VideoCard from "../src/components/VideoCard";
 
 const HomeScreen = ({ navigation }) => {
   const { session } = useContext(AuthContext);
@@ -110,7 +111,7 @@ const HomeScreen = ({ navigation }) => {
 
           <Text style={styles.header_txt}>ReoKids</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Search")}>
           <FontAwesome name="search" size={24} color="white" />
         </TouchableOpacity>
       </View>
@@ -119,27 +120,7 @@ const HomeScreen = ({ navigation }) => {
         keyExtractor={(item) => item.id}
         // onEndReached={getVideoList}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => {
-              PlayVideo.play(item);
-            }}
-            style={{ paddingHorizontal: 15 }}
-          >
-            <View style={styles.videoItem}>
-              <Image
-                source={{ uri: item.thumbnail_url }}
-                style={styles.thumbnail}
-              />
-              <View style={styles.textContainer}>
-                <Text style={styles.title} numberOfLines={1}>
-                  {item.title}
-                </Text>
-                {item.description && (
-                  <Text style={styles.description}>{item.description}</Text>
-                )}
-              </View>
-            </View>
-          </TouchableOpacity>
+          <VideoCard item={item} onSubmit={() => PlayVideo.play(item)} />
         )}
       />
     </View>
@@ -165,31 +146,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 
-  videoItem: {
-    marginBottom: 16,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    overflow: "hidden",
-    elevation: 2,
-    padding: 10,
-  },
-  thumbnail: {
-    width: "100%",
-    height: 220,
-    resizeMode: "contain",
-  },
-  textContainer: {
-    flex: 1,
-    padding: 10,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  description: {
-    fontSize: 14,
-    color: "gray",
-  },
   logo: {
     height: 25,
     width: 25,

@@ -6,41 +6,48 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
+  Image,
 } from "react-native";
+import { supabase } from "../lib/supabase";
+import PlayVideo from "./PlayVideo";
+import VideoCard from "../src/components/VideoCard";
+import { StatusBar } from "expo-status-bar";
 
-const videos = [
-  { id: "1", title: "Video 1", description: "Description 1" },
-  { id: "2", title: "Video 2", description: "Description 2" },
-  // Add more videos as needed
-];
-
-const SearchScreen = ({ navigation }) => {
+const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredVideos, setFilteredVideos] = useState([]);
 
-  const handleSearch = () => {
-    const filtered = videos.filter((video) =>
-      video.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    setFilteredVideos(filtered);
+  const handleSearch = async () => {
+    if (searchQuery) {
+      const { data, error } = await supabase
+        .from("Videos")
+        .select()
+        .textSearch("title", searchQuery)
+        .range(filteredVideos.length, filteredVideos.length + 1);
+
+      console.log(error);
+      setFilteredVideos((videoList) => [...videoList, ...data]);
+
+      console.log("filter data", data, error);
+    } else {
+      setFilteredVideos([]);
+    }
   };
 
   const renderItem = ({ item }) => (
-    <TouchableOpacity
-      onPress={() => navigation.navigate("Video", { video: item })}
-    >
-      <View style={styles.videoItem}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-      </View>
-    </TouchableOpacity>
+    <VideoCard item={item} onSubmit={() => PlayVideo.play(item)} />
   );
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={true} />
+      <View style={styles.header_container}>
+        <Image source={require("../assets/image01.png")} style={styles.logo} />
+        <Text style={styles.header_txt}>Search</Text>
+      </View>
       <TextInput
         style={styles.input}
-        placeholder="Search"
+        placeholder="Search Video"
         value={searchQuery}
         onChangeText={setSearchQuery}
         onSubmitEditing={handleSearch}
@@ -60,17 +67,27 @@ const SearchScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "white",
   },
+  header_container: {
+    backgroundColor: "black",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+
   input: {
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
     marginBottom: 16,
     paddingHorizontal: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
+    borderRadius: 20,
+    backgroundColor: "lightgray",
+    marginHorizontal: 50,
+    marginTop: 40,
   },
   videoItem: {
     backgroundColor: "#fff",
@@ -89,9 +106,21 @@ const styles = StyleSheet.create({
   },
   emptyList: {
     alignSelf: "center",
-    marginTop: 20,
+    marginTop: 50,
     fontSize: 16,
-    color: "gray",
+    color: "black",
+  },
+  logo: {
+    height: 25,
+    width: 25,
+    borderWidth: 1,
+    borderColor: "#4E9CA8",
+    borderRadius: 99,
+  },
+  header_txt: {
+    color: "#4E9CA8",
+    fontSize: 22,
+    fontWeight: "bold",
   },
 });
 

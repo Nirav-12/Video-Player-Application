@@ -6,16 +6,19 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ImageBackground,
 } from "react-native";
 import { supabase } from "../lib/supabase";
 import { StatusBar } from "expo-status-bar";
 import { AuthContext } from "../context/AuthProvider";
 import { FontAwesome5 } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
+import { decode } from "base64-arraybuffer";
 
 const ProfileScreen = () => {
   const { session } = useContext(AuthContext);
 
-  const [userData, setUserData] = useState(null);
+  const [userData, setUserData] = useState();
 
   useEffect(() => {
     getUserData();
@@ -33,10 +36,40 @@ const ProfileScreen = () => {
     console.log(error);
   };
 
-  const [name, setName] = useState("John Doe"); // Example name
-  const [profilePhoto, setProfilePhoto] = useState(
-    require("../assets/icon.png")
-  ); // Example profile photo
+  const GetImage = async () => {
+    let response = await ImagePicker.launchImageLibraryAsync({
+      allowsEditing: true,
+      base64: true,
+    });
+
+    if (!response.canceled) {
+      console.log("image url ", response);
+
+      const { data, error } = await supabase.storage
+        .from("test")
+        .upload(
+          `profileImage/${response.assets[0].fileName}`,
+          decode(response.assets[0].base64),
+          {
+            contentType: response.assets[0].mimeType,
+          }
+        );
+
+      const { data: uploadData, error: uploadDError } = await supabase
+        .from("User")
+        .update({
+          profileImage: `https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/${data.fullPath}`,
+        })
+        .eq("email", session?.user?.user_metadata?.email);
+
+      if (!uploadDError) {
+        setUserData({
+          ...userData,
+          profileImage: `https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/${data.fullPath}`,
+        });
+      }
+    }
+  };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
@@ -48,6 +81,8 @@ const ProfileScreen = () => {
       <StatusBar hidden={true} />
       {/* haeder */}
       <View style={styles.header_container}>
+        <Image source={require("../assets/image01.png")} style={styles.logo} />
+
         <Text style={styles.header_txt}>Profile</Text>
       </View>
 
@@ -69,10 +104,13 @@ const ProfileScreen = () => {
             style={styles.profilePhoto}
           />
         ) : (
-          <Image source={profilePhoto} style={styles.profilePhoto} />
+          <Image
+            source={require("../assets/icon.png")}
+            style={styles.profilePhoto}
+          />
         )}
         {!userData?.profileImage && (
-          <TouchableOpacity style={styles.changePhotoButton}>
+          <TouchableOpacity style={styles.changePhotoButton} onPress={GetImage}>
             <FontAwesome5 name="edit" size={15} color="black" />
           </TouchableOpacity>
         )}
@@ -101,8 +139,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     flexDirection: "row",
-    justifyContent: "space-between",
     alignItems: "center",
+    gap: 10,
   },
   header_txt: {
     color: "#4E9CA8",
@@ -144,6 +182,13 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  logo: {
+    height: 25,
+    width: 25,
+    borderWidth: 1,
+    borderColor: "#4E9CA8",
+    borderRadius: 99,
   },
 });
 
