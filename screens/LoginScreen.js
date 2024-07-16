@@ -14,9 +14,11 @@ import { supabase } from "../lib/supabase";
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("test@test.com");
   const [password, setPassword] = useState("password");
+  const [loading, setLoading] = useState(false);
 
   async function signInWithEmail() {
-    // setLoading(true);
+    setLoading(true);
+
     const response = await supabase.auth.signInWithPassword({
       email: email,
       password: password,
@@ -24,54 +26,54 @@ const LoginScreen = ({ navigation }) => {
     const { error } = response;
 
     if (error) Alert.alert(error.message);
-    // setLoading(false);
+    setLoading(false);
   }
 
   return (
-    <ImageBackground
-      source={require("../assets/baground.png")} // Replace with your background image
-      style={styles.container}
-      resizeMode="cover"
-    >
-      <Image source={require("../assets/image01.png")} style={styles.logo} />
-      <Text style={styles.title}>Welcome to ReoKids</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#aaa"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      <TouchableOpacity style={styles.button} onPress={signInWithEmail}>
-        <Text style={styles.buttonText}>Login</Text>
-      </TouchableOpacity>
-
-      <View
-        style={{
-          flexDirection: "row",
-          width: "90%",
-          justifyContent: "space-between",
-        }}
+    <View style={{ backgroundColor: "black", flex: 1 }}>
+      <ImageBackground
+        source={require("../assets/baground.png")} // Replace with your background image
+        style={styles.container}
+        resizeMode="cover"
       >
-        <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")}>
-          <Text style={styles.registerText}>Forgot Password?</Text>
+        <Image source={require("../assets/image01.png")} style={styles.logo} />
+        <Text style={styles.title}>Welcome to ReoKids</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Email"
+          placeholderTextColor="#aaa"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Password"
+          placeholderTextColor="#aaa"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={signInWithEmail}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>Login</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-          <Text style={styles.registerText}>Sign Up </Text>
+
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Register")}
+          disabled={loading}
+        >
+          <Text style={styles.registerText}>
+            Don't have an account? Sign Up
+          </Text>
         </TouchableOpacity>
-      </View>
-    </ImageBackground>
+      </ImageBackground>
+    </View>
   );
 };
 

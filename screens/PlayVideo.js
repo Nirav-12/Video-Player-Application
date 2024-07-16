@@ -1,8 +1,7 @@
-import { View, Text, DeviceEventEmitter } from "react-native";
-import React, { useEffect, useRef, useState } from "react";
-import VideoScreen from "./VideoScreen";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useSharedValue } from "react-native-reanimated";
+import { DeviceEventEmitter, View } from "react-native";
+import React, { useEffect, useState } from "react";
+import VideoPlayer from "./VideoPlayer";
+
 const PlayVideo = () => {
   const [playVideo, setPlayVideo] = useState(null);
 
@@ -18,10 +17,7 @@ const PlayVideo = () => {
     return () => DeviceEventEmitter.removeAllListeners();
   }, []);
 
-  const videoRef = useRef(null);
-  const isMinimized = useSharedValue(false); // State for tracking minimized state
-
-  return <>{playVideo ? <VideoScreen /> : null}</>;
+  return <>{playVideo ? <VideoPlayer props={playVideo} /> : <View></View>}</>;
 };
 
 PlayVideo.play = (val) => {

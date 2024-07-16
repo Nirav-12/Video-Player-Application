@@ -1,116 +1,96 @@
 import React, { useState } from "react";
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
   Alert,
+  ImageBackground,
+  View,
 } from "react-native";
 import { supabase } from "../lib/supabase";
 import { Image } from "react-native";
-import { AntDesign } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
-import * as FileSystem from "expo-file-system";
 
 export default function RegisterScreen({ navigation }) {
-  const [name, setName] = useState("John Doe"); // Example name
-  const [image, setImage] = useState(null);
+  const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("test@test.com");
   const [password, setPassword] = useState("password");
   const [loading, setLoading] = useState(false);
 
-  const GetImage = async () => {
-    let response = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-    });
-
-    if (!response.canceled) {
-      setImage(response.assets[0].uri);
-    }
-  };
-
   async function signUpWithEmail() {
-    setLoading(true);
-    const {
-      data: { session },
-      error,
-    } = await supabase.auth.signUp({
-      email: email,
-      password: password,
-      options: {
-        data: {
-          name,
-          table_created: false,
+    if (name) {
+      setLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            name,
+            table_created: false,
+          },
         },
-      },
-    });
-    if (error) Alert.alert(error.message);
-    if (!session)
-      Alert.alert("Please check your inbox for email verification!");
-    setLoading(false);
+      });
+      if (!session) {
+      }
+
+      setLoading(false);
+    }
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create Account</Text>
-      <View>
-        <View
-          style={{
-            borderWidth: 1,
-            height: 70,
-            width: 70,
-            borderRadius: 35,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          {!image ? (
-            <AntDesign name="user" size={24} color="black" />
-          ) : (
-            <Image
-              source={image}
-              style={{ height: 70, width: 70, borderRadius: 35 }}
-            />
-          )}
-        </View>
+    <View style={{ backgroundColor: "black", flex: 1 }}>
+      <ImageBackground
+        source={require("../assets/baground.png")} // Replace with your background image
+        style={styles.container}
+        resizeMode="cover"
+      >
+        <Image source={require("../assets/image01.png")} style={styles.logo} />
 
-        <TouchableOpacity onPress={() => GetImage()}>
-          <Text style={{ color: "#108FE5" }}>+ Add photo</Text>
+        <Text style={styles.title}>Create Account</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Name"
+          placeholderTextColor="#aaa"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Email"
+          placeholderTextColor="#aaa"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Password"
+          placeholderTextColor="#aaa"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          autoCapitalize="none"
+        />
+        <TouchableOpacity
+          style={styles.button}
+          onPress={signUpWithEmail}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-      </View>
-      <TextInput
-        style={styles.input}
-        placeholder="Name"
-        placeholderTextColor="#aaa"
-        value={name}
-        onChangeText={setName}
-        autoCapitalize="words"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#aaa"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        autoCapitalize="none"
-      />
-      <TouchableOpacity style={styles.button} onPress={signUpWithEmail}>
-        <Text style={styles.buttonText}>Register</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-        <Text style={styles.loginText}>Already have an account? Login</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Login")}
+          disabled={loading}
+        >
+          <Text style={styles.loginText}>Already have an account? Sign In</Text>
+        </TouchableOpacity>
+      </ImageBackground>
     </View>
   );
 }
@@ -119,7 +99,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#f0f8ff",
-    justifyContent: "center",
     alignItems: "center",
     padding: 20,
   },
@@ -127,7 +106,8 @@ const styles = StyleSheet.create({
     fontSize: 32,
     fontWeight: "bold",
     marginBottom: 40,
-    color: "#333",
+    color: "#fff",
+    marginTop: 60,
   },
   input: {
     width: "100%",
@@ -141,10 +121,12 @@ const styles = StyleSheet.create({
   button: {
     width: "100%",
     padding: 15,
-    backgroundColor: "#ff6347",
-    borderRadius: 8,
+    backgroundColor: "transparent",
     alignItems: "center",
     marginBottom: 20,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#4E9CA8",
   },
   buttonText: {
     color: "#fff",
@@ -152,7 +134,16 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   loginText: {
-    color: "#007BFF",
+    color: "#4E9CA8",
     fontSize: 16,
+  },
+  logo: {
+    overflow: "hidden",
+    height: 70,
+    width: 70,
+    borderWidth: 1,
+    borderColor: "#4E9CA8",
+    borderRadius: 99,
+    marginTop: 120,
   },
 });

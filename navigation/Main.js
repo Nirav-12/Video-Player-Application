@@ -1,4 +1,3 @@
-import "react-native-gesture-handler";
 import * as React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -6,8 +5,6 @@ import { Ionicons } from "@expo/vector-icons"; // or any icon library
 import HomeScreen from "../screens/HomeScreen";
 import SearchScreen from "../screens/SearchScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import VideoScreen from "../screens/VideoScreen";
-import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 import PlayVideo from "../screens/PlayVideo";
 
 // epKFrVylGEgznmEv
@@ -38,6 +35,7 @@ function MainTab() {
           tabBarInactiveBackgroundColor: "black",
           tabBarActiveTintColor: "#4E9CA8",
           tabBarInactiveTintColor: "white",
+          headerShown: false,
           tabBarStyle: {
             height: 50,
           },
@@ -56,11 +54,7 @@ function MainTab() {
           },
         })}
       >
-        <Tab.Screen
-          name="Home"
-          component={HomeScreen}
-          options={{ headerShown: false }}
-        />
+        <Tab.Screen name="Home" component={HomeScreen} />
         <Tab.Screen name="Profile" component={ProfileScreen} />
       </Tab.Navigator>
     </>

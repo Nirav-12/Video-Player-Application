@@ -10,6 +10,8 @@ import {
 import { AuthContext } from "../context/AuthProvider";
 import { supabase } from "../lib/supabase";
 import PlayVideo from "./PlayVideo";
+import { StatusBar } from "expo-status-bar";
+import { FontAwesome } from "@expo/vector-icons";
 
 const HomeScreen = ({ navigation }) => {
   const { session } = useContext(AuthContext);
@@ -63,6 +65,14 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     // getVideoList();
+    console.log("mete data", session?.user?.user_metadata);
+
+    if (!session?.user?.user_metadata?.table_created) {
+      console.log("add data call");
+      addData();
+    } else {
+      console.log("add data no call");
+    }
   }, []);
 
   const getVideoList = async () => {
@@ -76,16 +86,34 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const addData = async () => {
-    const error = await supabase.from("User").insert({
+    const { error } = await supabase.from("User").insert({
       name: session?.user?.user_metadata?.name,
-      email: session?.user?.user_metadata?.name.email,
+      email: session?.user?.user_metadata?.email,
     });
-
+    if (error) {
+      const { data, error } = await supabase.auth.updateUser({
+        data: { table_created: true },
+      });
+    }
     console.log("----->>>>>>>>error", error);
   };
 
   return (
     <View style={styles.container}>
+      <StatusBar hidden={true} />
+      <View style={styles.header_container}>
+        <View style={{ alignItems: "center", flexDirection: "row", gap: 10 }}>
+          <Image
+            source={require("../assets/image01.png")}
+            style={styles.logo}
+          />
+
+          <Text style={styles.header_txt}>ReoKids</Text>
+        </View>
+        <TouchableOpacity>
+          <FontAwesome name="search" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={videoList}
         keyExtractor={(item) => item.id}
@@ -95,6 +123,7 @@ const HomeScreen = ({ navigation }) => {
             onPress={() => {
               PlayVideo.play(item);
             }}
+            style={{ paddingHorizontal: 15 }}
           >
             <View style={styles.videoItem}>
               <Image
@@ -105,16 +134,14 @@ const HomeScreen = ({ navigation }) => {
                 <Text style={styles.title} numberOfLines={1}>
                   {item.title}
                 </Text>
-                <Text style={styles.description}>{item.description}</Text>
+                {item.description && (
+                  <Text style={styles.description}>{item.description}</Text>
+                )}
               </View>
             </View>
           </TouchableOpacity>
         )}
       />
-
-      {/* <TouchableOpacity style={{ marginTop: 20 }} onPress={addData}>
-        <Text>Add data to table</Text>
-      </TouchableOpacity> */}
     </View>
   );
 };
@@ -122,9 +149,22 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "White",
   },
+  header_container: {
+    backgroundColor: "black",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  header_txt: {
+    color: "#4E9CA8",
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+
   videoItem: {
     marginBottom: 16,
     backgroundColor: "#fff",
@@ -149,6 +189,13 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: "gray",
+  },
+  logo: {
+    height: 25,
+    width: 25,
+    borderWidth: 1,
+    borderColor: "#4E9CA8",
+    borderRadius: 99,
   },
 });
 
