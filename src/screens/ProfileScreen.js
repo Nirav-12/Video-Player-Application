@@ -1,19 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  Image,
-  ImageBackground,
-} from "react-native";
-import { supabase } from "../lib/supabase";
+import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { AuthContext } from "../context/AuthProvider";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { decode } from "base64-arraybuffer";
+import { AuthContext } from "../context/AuthProvider";
+import { supabase } from "../../lib/supabase";
 
 const ProfileScreen = () => {
   const { session } = useContext(AuthContext);
@@ -81,7 +73,10 @@ const ProfileScreen = () => {
       <StatusBar hidden={true} />
       {/* haeder */}
       <View style={styles.header_container}>
-        <Image source={require("../assets/image01.png")} style={styles.logo} />
+        <Image
+          source={require("../../assets/image01.png")}
+          style={styles.logo}
+        />
 
         <Text style={styles.header_txt}>Profile</Text>
       </View>
@@ -105,7 +100,7 @@ const ProfileScreen = () => {
           />
         ) : (
           <Image
-            source={require("../assets/icon.png")}
+            source={require("../../assets/icon.png")}
             style={styles.profilePhoto}
           />
         )}

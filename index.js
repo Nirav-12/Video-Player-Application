@@ -1,10 +1,10 @@
 import "react-native-gesture-handler";
 import React, { useContext } from "react";
 import { NavigationContainer } from "@react-navigation/native";
-import Authentication from "./navigation/Authentication";
-import Main from "./navigation/Main";
-import Loading from "./navigation/Loading";
-import { AuthContext } from "./context/AuthProvider";
+import Authentication from "./src/navigation/Authentication";
+import Main from "./src/navigation/Main";
+import Loading from "./src/navigation/Loading";
+import { AuthContext } from "./src/context/AuthProvider";
 
 // epKFrVylGEgznmEv
 

@@ -3,9 +3,9 @@ import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons"; // or any icon library
 import HomeScreen from "../screens/HomeScreen";
+import PlayVideo from "../screens/PlayVideo";
 import SearchScreen from "../screens/SearchScreen";
 import ProfileScreen from "../screens/ProfileScreen";
-import PlayVideo from "../screens/PlayVideo";
 
 // epKFrVylGEgznmEv
 

@@ -7,12 +7,12 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { AuthContext } from "../context/AuthProvider";
-import { supabase } from "../lib/supabase";
 import PlayVideo from "./PlayVideo";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome } from "@expo/vector-icons";
-import VideoCard from "../src/components/VideoCard";
+import { AuthContext } from "../context/AuthProvider";
+import { supabase } from "../../lib/supabase";
+import VideoCard from "../components/VideoCard";
 
 const HomeScreen = ({ navigation }) => {
   const { session } = useContext(AuthContext);
@@ -105,7 +105,7 @@ const HomeScreen = ({ navigation }) => {
       <View style={styles.header_container}>
         <View style={{ alignItems: "center", flexDirection: "row", gap: 10 }}>
           <Image
-            source={require("../assets/image01.png")}
+            source={require("../../assets/image01.png")}
             style={styles.logo}
           />
 

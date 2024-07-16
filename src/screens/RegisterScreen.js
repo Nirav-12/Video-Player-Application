@@ -1,43 +1,67 @@
 import React, { useState } from "react";
 import {
-  View,
   Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
-  ImageBackground,
-  Image,
   Alert,
+  ImageBackground,
+  View,
 } from "react-native";
-import { supabase } from "../lib/supabase";
+import { Image } from "react-native";
+import { supabase } from "../../lib/supabase";
 
-const LoginScreen = ({ navigation }) => {
+export default function RegisterScreen({ navigation }) {
+  const [name, setName] = useState("John Doe");
   const [email, setEmail] = useState("test@test.com");
   const [password, setPassword] = useState("password");
   const [loading, setLoading] = useState(false);
 
-  async function signInWithEmail() {
-    setLoading(true);
+  async function signUpWithEmail() {
+    if (name) {
+      setLoading(true);
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+          data: {
+            name,
+            table_created: false,
+          },
+        },
+      });
+      if (!session) {
+      }
 
-    const response = await supabase.auth.signInWithPassword({
-      email: email,
-      password: password,
-    });
-    const { error } = response;
-
-    if (error) Alert.alert(error.message);
-    setLoading(false);
+      setLoading(false);
+    }
   }
 
   return (
     <View style={{ backgroundColor: "black", flex: 1 }}>
       <ImageBackground
-        source={require("../assets/baground.png")} // Replace with your background image
+        source={require("../../assets/baground.png")} // Replace with your background image
         style={styles.container}
         resizeMode="cover"
       >
-        <Image source={require("../assets/image01.png")} style={styles.logo} />
-        <Text style={styles.title}>Welcome to ReoKids</Text>
+        <Image
+          source={require("../../assets/image01.png")}
+          style={styles.logo}
+        />
+
+        <Text style={styles.title}>Create Account</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Enter Name"
+          placeholderTextColor="#aaa"
+          value={name}
+          onChangeText={setName}
+          autoCapitalize="words"
+        />
         <TextInput
           style={styles.input}
           placeholder="Enter Email"
@@ -58,24 +82,21 @@ const LoginScreen = ({ navigation }) => {
         />
         <TouchableOpacity
           style={styles.button}
-          onPress={signInWithEmail}
+          onPress={signUpWithEmail}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>Login</Text>
+          <Text style={styles.buttonText}>Sign Up</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
-          onPress={() => navigation.navigate("Register")}
+          onPress={() => navigation.navigate("Login")}
           disabled={loading}
         >
-          <Text style={styles.registerText}>
-            Don't have an account? Sign Up
-          </Text>
+          <Text style={styles.loginText}>Already have an account? Sign In</Text>
         </TouchableOpacity>
       </ImageBackground>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -89,7 +110,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 40,
     color: "#fff",
-    marginTop: 100,
+    marginTop: 60,
   },
   input: {
     width: "100%",
@@ -115,15 +136,9 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
-  registerText: {
-    // color: "#007BFF",
+  loginText: {
     color: "#4E9CA8",
     fontSize: 16,
-  },
-  background: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
   },
   logo: {
     overflow: "hidden",
@@ -135,5 +150,3 @@ const styles = StyleSheet.create({
     marginTop: 120,
   },
 });
-
-export default LoginScreen;

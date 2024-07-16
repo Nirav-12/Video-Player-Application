@@ -23,7 +23,6 @@ import Animated, {
 import { StatusBar } from "expo-status-bar";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import PlayVideo from "./PlayVideo";
 import { Directions } from "react-native-gesture-handler";
 import * as ScreenOrientation from "expo-screen-orientation";
 
@@ -31,7 +30,7 @@ const { width, height } = Dimensions.get("window");
 const miniMizedWidth = 120;
 const miniMizedHieght = 70;
 
-const VideoPlayer = ({ props }) => {
+const VideoPlayer = ({ props, closePlayer }) => {
   const { description, thumbnail_url, title, video_url } = props;
 
   const translateX = useSharedValue(0);
@@ -181,7 +180,7 @@ const VideoPlayer = ({ props }) => {
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.miniScreen_btn}
-                onPress={() => PlayVideo.close()}
+                onPress={closePlayer}
               >
                 <Ionicons name="close-circle" size={30} color="black" />
               </TouchableOpacity>

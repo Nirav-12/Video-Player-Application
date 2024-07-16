@@ -8,10 +8,10 @@ import {
   StyleSheet,
   Image,
 } from "react-native";
-import { supabase } from "../lib/supabase";
 import PlayVideo from "./PlayVideo";
-import VideoCard from "../src/components/VideoCard";
 import { StatusBar } from "expo-status-bar";
+import { supabase } from "../../lib/supabase";
+import VideoCard from "../components/VideoCard";
 
 const SearchScreen = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -42,7 +42,10 @@ const SearchScreen = () => {
     <View style={styles.container}>
       <StatusBar hidden={true} />
       <View style={styles.header_container}>
-        <Image source={require("../assets/image01.png")} style={styles.logo} />
+        <Image
+          source={require("../../assets/image01.png")}
+          style={styles.logo}
+        />
         <Text style={styles.header_txt}>Search</Text>
       </View>
       <TextInput

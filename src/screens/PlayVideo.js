@@ -17,7 +17,15 @@ const PlayVideo = () => {
     return () => DeviceEventEmitter.removeAllListeners();
   }, []);
 
-  return <>{playVideo ? <VideoPlayer props={playVideo} /> : <View></View>}</>;
+  return (
+    <>
+      {playVideo ? (
+        <VideoPlayer props={playVideo} closePlayer={PlayVideo.close} />
+      ) : (
+        <View></View>
+      )}
+    </>
+  );
 };
 
 PlayVideo.play = (val) => {
