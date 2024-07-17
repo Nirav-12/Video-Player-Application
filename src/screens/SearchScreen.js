@@ -7,6 +7,7 @@ import {
   Text,
   StyleSheet,
   Image,
+  ToastAndroid,
 } from "react-native";
 import PlayVideo from "./PlayVideo";
 import { StatusBar } from "expo-status-bar";
@@ -26,9 +27,9 @@ const SearchScreen = () => {
         .range(filteredVideos.length, filteredVideos.length + 1);
 
       console.log(error);
-      setFilteredVideos((videoList) => [...videoList, ...data]);
+      if (error) ToastAndroid.show(error.message, ToastAndroid.SHORT);
 
-      console.log("filter data", data, error);
+      setFilteredVideos((videoList) => [...videoList, ...data]);
     } else {
       setFilteredVideos([]);
     }
@@ -37,6 +38,11 @@ const SearchScreen = () => {
   const renderItem = ({ item }) => (
     <VideoCard item={item} onSubmit={() => PlayVideo.play(item)} />
   );
+
+  const clearSearch = () => {
+    setSearchQuery("");
+    setFilteredVideos([]);
+  };
 
   return (
     <View style={styles.container}>
@@ -55,6 +61,19 @@ const SearchScreen = () => {
         onChangeText={setSearchQuery}
         onSubmitEditing={handleSearch}
       />
+      {filteredVideos.length > 0 && (
+        <TouchableOpacity
+          onPress={clearSearch}
+          style={{
+            alignItems: "flex-end",
+            marginBottom: 16,
+            marginHorizontal: 50,
+            marginTop: 10,
+          }}
+        >
+          <Text style={{ color: "blue", fontSize: 16 }}>Clear Filter</Text>
+        </TouchableOpacity>
+      )}
       <FlatList
         data={filteredVideos}
         keyExtractor={(item) => item.id}
@@ -85,7 +104,6 @@ const styles = StyleSheet.create({
     height: 40,
     borderColor: "gray",
     borderWidth: 1,
-    marginBottom: 16,
     paddingHorizontal: 10,
     borderRadius: 20,
     backgroundColor: "lightgray",

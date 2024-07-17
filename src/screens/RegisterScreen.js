@@ -7,14 +7,15 @@ import {
   Alert,
   ImageBackground,
   View,
+  ToastAndroid,
 } from "react-native";
 import { Image } from "react-native";
 import { supabase } from "../../lib/supabase";
 
 export default function RegisterScreen({ navigation }) {
-  const [name, setName] = useState("John Doe");
-  const [email, setEmail] = useState("test@test.com");
-  const [password, setPassword] = useState("password");
+  const [name, setName] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function signUpWithEmail() {
@@ -35,6 +36,9 @@ export default function RegisterScreen({ navigation }) {
       });
       if (!session) {
       }
+      {
+        error && ToastAndroid.show(error?.message, ToastAndroid.SHORT);
+      }
 
       setLoading(false);
     }
@@ -43,7 +47,7 @@ export default function RegisterScreen({ navigation }) {
   return (
     <View style={{ backgroundColor: "black", flex: 1 }}>
       <ImageBackground
-        source={require("../../assets/baground.png")} // Replace with your background image
+        source={require("../../assets/baground.png")}
         style={styles.container}
         resizeMode="cover"
       >

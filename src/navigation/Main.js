@@ -7,8 +7,6 @@ import PlayVideo from "../screens/PlayVideo";
 import SearchScreen from "../screens/SearchScreen";
 import ProfileScreen from "../screens/ProfileScreen";
 
-// epKFrVylGEgznmEv
-
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 export default function Main() {

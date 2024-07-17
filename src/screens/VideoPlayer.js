@@ -48,7 +48,7 @@ const VideoPlayer = ({ props, closePlayer }) => {
   const flingUpGesture = Gesture.Fling()
     .direction(Directions.UP)
     .onEnd(() => {
-      console.log("Fling Up");
+      // console.log("Fling Up");
       if (!isMinimized.value) {
         runOnJS(showVideoInFullscreen)();
       }
@@ -57,7 +57,7 @@ const VideoPlayer = ({ props, closePlayer }) => {
   const flingDownGesture = Gesture.Fling()
     .direction(Directions.DOWN)
     .onEnd(() => {
-      console.log("Fling Down");
+      // console.log("Fling Down");
       // Snap to the bottom-right corner
       if (!isMinimized.value) {
         // setMini(true);
@@ -104,10 +104,6 @@ const VideoPlayer = ({ props, closePlayer }) => {
   });
 
   const onFullscreenUpdate = async ({ fullscreenUpdate }) => {
-    console.log(
-      "------------------->>>>>>>>>>>>>fullscreenUpdate",
-      fullscreenUpdate
-    );
     if (fullscreenUpdate == 1) {
       await ScreenOrientation.lockAsync(
         ScreenOrientation.OrientationLock.LANDSCAPE

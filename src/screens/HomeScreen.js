@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   StyleSheet,
   Image,
+  ToastAndroid,
+  RefreshControl,
 } from "react-native";
 import PlayVideo from "./PlayVideo";
 import { StatusBar } from "expo-status-bar";
@@ -16,63 +18,13 @@ import VideoCard from "../components/VideoCard";
 
 const HomeScreen = ({ navigation }) => {
   const { session } = useContext(AuthContext);
-  const [videoList, setVideoList] = useState([
-    {
-      created_at: "2024-07-15T06:57:21.632903+00:00",
-      description: null,
-      id: 4,
-      thumbnail_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Wood_Pecker__Deer_And_Tortoise___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.webp?t=2024-07-15T06%3A56%3A54.272Z ",
-      title:
-        "Wood Pecker, Deer And Tortoise - Jataka Tales In English - Animation / Cartoon Stories For Kids",
-      video_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Wood_Pecker__Deer_And_Tortoise___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4",
-    },
-    {
-      created_at: "2024-07-15T06:52:34.706032+00:00",
-      description:
-        "Fox And The Otters - Jataka Tales In English - Animation / Cartoon Stories For Kids",
-      id: 1,
-      thumbnail_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/%20Fox%20And%20The%20Otters%20-%20Jataka%20Tales%20In%20English.webp?t=2024-07-15T06%3A50%3A31.758Z",
-      title: "Fox And The Otters",
-      video_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/%20Fox%20And%20The%20Otters%20-%20Jataka%20Tales%20In%20English.mp4?t=2024-07-15T06%3A50%3A20.588Z",
-    },
-    {
-      created_at: "2024-07-15T06:55:42.60963+00:00",
-      description:
-        "Greedy Crow - Jataka Tales In English - Animation / Cartoon Stories For Kids",
-      id: 2,
-      thumbnail_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Greedy_Crow___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.webp?t=2024-07-15T06%3A55%3A06.881Z",
-      title: "Greedy Crow",
-      video_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/Greedy_Crow___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4?t=2024-07-15T06%3A54%3A58.464Z",
-    },
-    {
-      created_at: "2024-07-15T06:56:32.434201+00:00",
-      description:
-        "The Clever She Goat - Jataka Tales In English - Animation / Cartoon Stories For Kids ",
-      id: 3,
-      thumbnail_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/The_Clever_She_Goat___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.webp?t=2024-07-15T06%3A56%3A02.141Z",
-      title:
-        "The Clever She Goat - Jataka Tales In English - Animation / Cartoon Stories For Kids ",
-      video_url:
-        "https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/test/video/The_Clever_She_Goat___Jataka_Tales_In_English___Animation___Cartoon_Stories_For_Kids.mp4?t=2024-07-15T06%3A55%3A52.835Z",
-    },
-  ]);
+  const [videoList, setVideoList] = useState([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
-    // getVideoList();
-    console.log("mete data", session?.user?.user_metadata);
-
+    getVideoList();
     if (!session?.user?.user_metadata?.table_created) {
-      console.log("add data call");
       addData();
-    } else {
-      console.log("add data no call");
     }
   }, []);
 
@@ -80,9 +32,10 @@ const HomeScreen = ({ navigation }) => {
     let { data: Videos, error } = await supabase
       .from("Videos")
       .select("*")
-      .range(videoList.length, videoList.length + 1);
+      .range(videoList.length, videoList.length + 2);
 
-    console.log(error);
+    if (error) ToastAndroid.show(error?.message, ToastAndroid.SHORT);
+
     setVideoList((videoList) => [...videoList, ...Videos]);
   };
 
@@ -92,13 +45,21 @@ const HomeScreen = ({ navigation }) => {
       email: session?.user?.user_metadata?.email,
     });
     if (error) {
-      const { data, error } = await supabase.auth.updateUser({
+      const { data } = await supabase.auth.updateUser({
         data: { table_created: true },
       });
     }
+
+    if (error) ToastAndroid.show(error?.message, ToastAndroid.SHORT);
+
     console.log("----->>>>>>>>error", error);
   };
-
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+    setVideoList([]);
+    getVideoList();
+    setRefreshing(false);
+  }, []);
   return (
     <View style={styles.container}>
       <StatusBar hidden={true} />
@@ -117,10 +78,16 @@ const HomeScreen = ({ navigation }) => {
       </View>
       <FlatList
         data={videoList}
-        keyExtractor={(item) => item.id}
-        // onEndReached={getVideoList}
-        renderItem={({ item }) => (
-          <VideoCard item={item} onSubmit={() => PlayVideo.play(item)} />
+        onEndReached={getVideoList}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+        renderItem={({ item, index }) => (
+          <VideoCard
+            item={item}
+            onSubmit={() => PlayVideo.play(item)}
+            key={index}
+          />
         )}
       />
     </View>

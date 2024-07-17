@@ -7,13 +7,13 @@ import {
   StyleSheet,
   ImageBackground,
   Image,
-  Alert,
+  ToastAndroid,
 } from "react-native";
 import { supabase } from "../../lib/supabase";
 
 const LoginScreen = ({ navigation }) => {
-  const [email, setEmail] = useState("test@test.com");
-  const [password, setPassword] = useState("password");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function signInWithEmail() {
@@ -25,14 +25,14 @@ const LoginScreen = ({ navigation }) => {
     });
     const { error } = response;
 
-    if (error) Alert.alert(error.message);
+    if (error) ToastAndroid.show(error.message, ToastAndroid.SHORT);
     setLoading(false);
   }
 
   return (
     <View style={{ backgroundColor: "black", flex: 1 }}>
       <ImageBackground
-        source={require("../../assets/baground.png")} // Replace with your background image
+        source={require("../../assets/baground.png")}
         style={styles.container}
         resizeMode="cover"
       >
@@ -119,7 +119,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   registerText: {
-    // color: "#007BFF",
     color: "#4E9CA8",
     fontSize: 16,
   },

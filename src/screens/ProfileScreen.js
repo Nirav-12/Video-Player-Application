@@ -1,11 +1,20 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  ToastAndroid,
+  ImageBackground,
+} from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import { decode } from "base64-arraybuffer";
 import { AuthContext } from "../context/AuthProvider";
 import { supabase } from "../../lib/supabase";
+import { Feather } from "@expo/vector-icons";
 
 const ProfileScreen = () => {
   const { session } = useContext(AuthContext);
@@ -22,10 +31,8 @@ const ProfileScreen = () => {
       .select("*")
       .eq("email", session?.user?.user_metadata?.email);
 
-    console.log("user table data", ...User);
-
     setUserData(...User);
-    console.log(error);
+    if (error) ToastAndroid.show(error.message, ToastAndroid.SHORT);
   };
 
   const GetImage = async () => {
@@ -46,6 +53,7 @@ const ProfileScreen = () => {
             contentType: response.assets[0].mimeType,
           }
         );
+      if (error) ToastAndroid.show(error.message, ToastAndroid.SHORT);
 
       const { data: uploadData, error: uploadDError } = await supabase
         .from("User")
@@ -60,12 +68,14 @@ const ProfileScreen = () => {
           profileImage: `https://jyqnpymjcbsjnrnvpfdw.supabase.co/storage/v1/object/public/${data.fullPath}`,
         });
       }
+      if (uploadDError)
+        ToastAndroid.show(uploadDError.message, ToastAndroid.SHORT);
     }
   };
 
   const signOut = async () => {
     const { error } = await supabase.auth.signOut();
-    console.log("Sign Out Error", error);
+    if (error) ToastAndroid.show(error.message, ToastAndroid.SHORT);
   };
 
   return (
@@ -93,17 +103,29 @@ const ProfileScreen = () => {
           marginLeft: 15,
         }}
       >
-        {userData?.profileImage ? (
-          <Image
-            source={{ uri: userData?.profileImage }}
-            style={styles.profilePhoto}
-          />
-        ) : (
-          <Image
-            source={require("../../assets/icon.png")}
-            style={styles.profilePhoto}
-          />
-        )}
+        {/* {userData?.profileImage ? (
+
+        ) : ( */}
+        <View
+          style={[
+            styles.profilePhoto,
+            {
+              backgroundColor: "lightgray",
+              justifyContent: "center",
+              alignItems: "center",
+            },
+          ]}
+        >
+          {userData?.profileImage ? (
+            <Image
+              source={{ uri: userData?.profileImage }}
+              style={styles.profilePhoto}
+            />
+          ) : (
+            <Feather name="user" size={30} color="black" />
+          )}
+        </View>
+        {/* )} */}
         {!userData?.profileImage && (
           <TouchableOpacity style={styles.changePhotoButton} onPress={GetImage}>
             <FontAwesome5 name="edit" size={15} color="black" />
