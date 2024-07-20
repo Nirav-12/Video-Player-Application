@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
@@ -16,8 +16,6 @@ import Animated, {
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
-  withDelay,
-  withSpring,
   withTiming,
 } from "react-native-reanimated";
 import { StatusBar } from "expo-status-bar";
@@ -60,27 +58,22 @@ const VideoPlayer = ({ props, closePlayer }) => {
       // console.log("Fling Down");
       // Snap to the bottom-right corner
       if (!isMinimized.value) {
-        // setMini(true);
         isMinimized.value = true; // Set to true to trigger minimized state
         translateX.value = withTiming(0); // 200 is the width of the minimized container
-        translateY.value = withTiming(height - 120); // 150 is the height of the minimized container
+        translateY.value = withTiming(height - 120); // 70 is the height of the minimized container + 50 is height of bottom tab
         runOnJS(setMini)(true);
       }
     });
 
   const toggleMinimize = async () => {
     // Toggle minimized state
-    isMinimized.value = false;
-    setMini(false);
-
-    // Reset to initial position and size when maximizing
-    translateX.value = withTiming(0);
-    translateY.value = withTiming(0);
-  };
-
-  const handleContainerPress = () => {
     if (isMinimized.value) {
-      toggleMinimize();
+      isMinimized.value = false;
+      setMini(false);
+
+      // Reset to initial position and size when maximizing
+      translateX.value = withTiming(0);
+      translateY.value = withTiming(0);
     }
   };
 
@@ -91,15 +84,8 @@ const VideoPlayer = ({ props, closePlayer }) => {
         { translateY: translateY.value },
       ],
       width: withTiming(isMinimized.value ? miniMizedWidth : width),
-      height: withTiming(isMinimized.value ? miniMizedHieght : 300),
-    };
-  });
-
-  const animatedStyleContainer = useAnimatedStyle(() => {
-    return {
-      height: withDelay(100, withTiming(isMinimized.value ? 0 : height)),
-      opacity: withTiming(isMinimized.value ? 0 : 1),
-      paddingTop: withTiming(isMinimized.value ? 0 : 300),
+      height: withTiming(isMinimized.value ? miniMizedHieght : height),
+      backgroundColor: "black",
     };
   });
 
@@ -118,26 +104,28 @@ const VideoPlayer = ({ props, closePlayer }) => {
   };
 
   const composedGesture = Gesture.Race(flingUpGesture, flingDownGesture);
+
   return (
     <GestureHandlerRootView style={styles.container}>
       <StatusBar style="light" hidden={true} />
 
-      <GestureDetector gesture={composedGesture}>
-        <Animated.View style={[styles.videoContainer, animatedStyle]}>
-          <TouchableOpacity
-            activeOpacity={1}
-            style={{
-              ...StyleSheet.absoluteFill,
-              flexDirection: "row",
-            }}
-            onPress={handleContainerPress}
-          >
+      <Animated.View style={[styles.videoContainer, animatedStyle]}>
+        <TouchableOpacity
+          activeOpacity={1}
+          style={{
+            ...StyleSheet.absoluteFill,
+            flexDirection: mini ? "row" : "column",
+          }}
+          onPress={toggleMinimize}
+          disabled={!mini}
+        >
+          <GestureDetector gesture={composedGesture}>
             <Video
               ref={videoRef}
               source={{
                 uri: video_url,
               }}
-              style={styles.video}
+              style={[styles.video, { height: !mini ? 300 : miniMizedHieght }]}
               resizeMode="contain"
               onFullscreenUpdate={onFullscreenUpdate}
               useNativeControls={!mini} // Disable native controls
@@ -148,6 +136,8 @@ const VideoPlayer = ({ props, closePlayer }) => {
                 uri: thumbnail_url,
               }}
             />
+          </GestureDetector>
+          {mini ? (
             <View style={styles.mini_txt_container}>
               <TouchableOpacity
                 style={styles.mini_txt_btn}
@@ -181,18 +171,17 @@ const VideoPlayer = ({ props, closePlayer }) => {
                 <Ionicons name="close-circle" size={30} color="black" />
               </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-        </Animated.View>
-      </GestureDetector>
-      <Animated.View
-        style={[animatedStyleContainer, { backgroundColor: "white" }]}
-      >
-        <View style={{ padding: 20 }}>
-          <Text style={[styles.title, { fontSize: 25 }]}>{title}</Text>
-          <Text style={[styles.description, { fontSize: 18 }]}>
-            {description}
-          </Text>
-        </View>
+          ) : (
+            <View style={[{ backgroundColor: "white", flex: 1 }]}>
+              <View style={{ padding: 20 }}>
+                <Text style={[styles.title, { fontSize: 25 }]}>{title}</Text>
+                <Text style={[styles.description, { fontSize: 18 }]}>
+                  {description}
+                </Text>
+              </View>
+            </View>
+          )}
+        </TouchableOpacity>
       </Animated.View>
     </GestureHandlerRootView>
   );
@@ -204,29 +193,10 @@ const styles = StyleSheet.create({
     zIndex: 1,
     width: "100%",
   },
-  videoContainer: {
-    backgroundColor: "black",
-    zIndex: 2, // Ensure video container is above other elements
-    position: "absolute",
-  },
   video: {
     width: "100%",
-    height: "100%",
-    zIndex: 2, // Ensure video is above other elements
-  },
-  button: {
-    marginTop: 20,
-    padding: 10,
-    backgroundColor: "blue",
-    borderRadius: 5,
-    position: "absolute",
-    bottom: 10,
-    right: 10,
-    zIndex: 3,
-  },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
+    zIndex: 2,
+    alignSelf: "flex-start",
   },
   title: {
     fontSize: 16,
